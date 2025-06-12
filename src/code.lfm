@@ -14,12 +14,12 @@ object Form1: TForm1
   Font.Name = 'Calibri'
   Font.Style = [fsBold]
   OnCreate = FormCreate
-  LCLVersion = '3.8.0.0'
+  LCLVersion = '3.4.0.0'
   object HeadLabel1: TLabel
     Left = 16
-    Height = 42
+    Height = 49
     Top = 0
-    Width = 367
+    Width = 435
     Caption = 'Pente Perceptron Viewer'
     Color = clWhite
     Font.CharSet = ANSI_CHARSET
@@ -33,9 +33,9 @@ object Form1: TForm1
   end
   object HeadLabel3: TLabel
     Left = 1040
-    Height = 15
+    Height = 18
     Top = 16
-    Width = 133
+    Width = 144
     Caption = 'Version 1.0.0+20250612'
     Color = clWhite
     ParentColor = False
@@ -74,9 +74,9 @@ object Form1: TForm1
   end
   object LabelCurrentPerceptronMessage: TLabel
     Left = 22
-    Height = 33
+    Height = 37
     Top = 448
-    Width = 369
+    Width = 444
     Caption = 'LabelCurrentPerceptronMessage'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -106,9 +106,9 @@ object Form1: TForm1
   end
   object LabelFileMessage: TLabel
     Left = 296
-    Height = 23
+    Height = 27
     Top = 656
-    Width = 142
+    Width = 165
     Caption = 'LabelFileMessage'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -121,9 +121,9 @@ object Form1: TForm1
   end
   object LabelWhitePlayerStatistics: TLabel
     Left = 192
-    Height = 23
+    Height = 27
     Top = 498
-    Width = 212
+    Width = 251
     Caption = 'LabelWhitePlayerStatistics'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -136,9 +136,9 @@ object Form1: TForm1
   end
   object LabelBlackPlayerStatistics: TLabel
     Left = 192
-    Height = 23
+    Height = 27
     Top = 552
-    Width = 205
+    Width = 248
     Caption = 'LabelBlackPlayerStatistics'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -187,7 +187,7 @@ object Form1: TForm1
     Left = 22
     Height = 38
     Top = 592
-    Width = 216
+    Width = 250
     Caption = 'Next Perceptron'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -201,10 +201,10 @@ object Form1: TForm1
     OnClick = ButtonNextPerceptronClick
   end
   object ButtonPriorPerceptron: TButton
-    Left = 256
+    Left = 288
     Height = 38
     Top = 592
-    Width = 232
+    Width = 240
     Caption = 'Prior Perceptron'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
