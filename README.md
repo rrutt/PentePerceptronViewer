@@ -26,8 +26,6 @@ You can run the Pente Perceptron Viewer program on Microsoft Windows as follows:
 
 ### Ubuntu Linux
 
-_(Linux binary executable to be added later.)_
-
 You can run the Pente Perceptron Viewer program on Ubuntu Linux (and presumably other Linux distributions) as follows:
 
 - Download the **PentePerceptronViewer** binary executable file (with no file extension) from the **bin** sub-folder from this GitHub.com page.
