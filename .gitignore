@@ -1,0 +1,10 @@
+backup/
+lib/
+
+*.exe
+*.res
+*.json
+
+!bin/PentePerceptronViewer
+!bin/*.exe
+!dat/*.json
