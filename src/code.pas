@@ -150,9 +150,8 @@ var
   cell: PatternMatchCell;
 begin
   LabelCurrentPerceptronMessage.Caption :=
-    Format('%s Perceptron # %d: Weight = %s',
-      [PlayerName[CurrentPlayer], PerceptronIndex,
-      FloatToStrF(Perceptron.Weight, ffFixed, 10,4)]);
+    Format('%s Perceptron # %d: Weight = %g',
+      [PlayerName[CurrentPlayer], PerceptronIndex, Perceptron.Weight]);
   ButtonNextPerceptron.Enabled := true;
   ButtonPriorPerceptron.Enabled := true;
   TheBoard.LoadPerceptron(CurrentPerceptrons[PerceptronIndex]);
