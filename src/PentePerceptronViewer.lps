@@ -21,8 +21,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="128"/>
-        <CursorPos X="40" Y="157"/>
+        <TopLine Value="127"/>
+        <CursorPos X="44" Y="153"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -80,22 +80,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="code.pas"/>
-        <Caret Line="181" Column="50" TopLine="164"/>
-      </Position>
-      <Position>
-        <Filename Value="gameboard.pas"/>
-        <Caret Line="54" Column="50" TopLine="26"/>
-      </Position>
-      <Position>
-        <Filename Value="gameboard.pas"/>
-        <Caret Line="11" Column="15" TopLine="5"/>
-      </Position>
-      <Position>
-        <Filename Value="code.pas"/>
-        <Caret Line="168" Column="28" TopLine="161"/>
-      </Position>
       <Position>
         <Filename Value="code.pas"/>
         <Caret Line="164" TopLine="158"/>
@@ -196,6 +180,21 @@
       <Position>
         <Filename Value="code.pas"/>
         <Caret Line="99" TopLine="76"/>
+      </Position>
+      <Position>
+        <Filename Value="code.pas"/>
+        <Caret Line="142" Column="50" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="code.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="code.pas"/>
+        <Caret Line="31" Column="17" TopLine="3"/>
+      </Position>
+      <Position>
+        <Filename Value="code.pas"/>
+        <Caret Line="91" Column="15" TopLine="63"/>
       </Position>
     </JumpHistory>
     <RunParams>

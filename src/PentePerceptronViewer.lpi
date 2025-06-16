@@ -17,7 +17,8 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="1"/>
-      <StringTable CompanyName="Richard Rutt" FileDescription="Pente Perceptron Viewer" LegalCopyright="Copyright 2025 Rick Rutt" ProductName="Perceptron Pente" ProductVersion="1.0.0+20250612"/>
+      <RevisionNr Value="1"/>
+      <StringTable CompanyName="Richard Rutt" FileDescription="Pente Perceptron Viewer" LegalCopyright="Copyright 2025 Rick Rutt" ProductName="Perceptron Pente" ProductVersion="1.0.1+20250616"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>

@@ -1,6 +1,6 @@
 # Pente Perceptron Viewer
 
-_Version 1.0.0+20250612  ([Version Release Notes](#ReleaseNotes))_ 
+_Version 1.0.1+20250616  ([Version Release Notes](#ReleaseNotes))_ 
 
 The **Pente Perceptron Viewer** is a companion project for the **[Perceptron Pente](https://github.com/rrutt/PerceptronPente)** program.
 
@@ -90,6 +90,10 @@ Then rebuild the executable using the **Run | Build** menu item (or using the sh
 <a name="ReleaseNotes"></a>
 
 ## Release Notes
+
+### Version 1.0.1
+
+- Revised formatting of Perceptron weight value.
 
 ### Version 1.0.0
 
