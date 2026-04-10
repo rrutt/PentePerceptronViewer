@@ -1,4 +1,4 @@
-// Copyright 2025 Rick Rutt
+// Copyright 2025-2026 Rick Rutt
 
 unit code;
 
@@ -17,8 +17,8 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
-    ButtonLoadBlack: TButton;
-    ButtonLoadWhite: TButton;
+    ButtonLoadNextPlayer: TButton;
+    ButtonLoadPriorPlayer: TButton;
     ButtonNextPerceptron: TButton;
     ButtonPriorPerceptron: TButton;
     ButtonReadPerceptronsFromFile: TButton;
@@ -26,23 +26,19 @@ type
     HeadLabel1: TLabel;
     HeadLabel3: TLabel;
     GameBoardStringGrid: TStringGrid;
-    LabelWhitePlayerStatistics: TLabel;
-    LabelBlackPlayerStatistics: TLabel;
     LabelCurrentPerceptronMessage: TLabel;
     LabelFileMessage: TLabel;
+    LabelPlayerStatistics: TLabel;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
 
-    procedure ButtonLoadBlackClick(Sender: TObject);
-    procedure ButtonLoadWhiteClick(Sender: TObject);
+    procedure ButtonLoadNextPlayerClick(Sender: TObject);
+    procedure ButtonLoadPriorPlayerClick(Sender: TObject);
     procedure ButtonNextPerceptronClick(Sender: TObject);
     procedure ButtonPriorPerceptronClick(Sender: TObject);
     procedure DisplayPerceptron(Perceptron: TPerceptron);
     procedure ButtonReadPerceptronsFromFileClick(Sender: TObject);
-    procedure ButtonWritePerceptronsToFileClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure GameBoardDrawGridMouseDown(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; X, Y: Integer);
     procedure GameBoardDrawGridDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; {%H-}aState: TGridDrawState);
     procedure GameBoardStringGridPrepareCanvas(Sender: TObject; {%H-}aCol,
@@ -51,17 +47,17 @@ type
   private
     TheBoard: TGameBoard;
 
-    CurrentPlayer: PlayerPiece;
+    CurrentPlayerIndex: integer;
     CurrentPerceptrons: TPerceptronArray;
     PerceptronIndex: integer;
 
-    PlayerName: array[WhitePiece..BlackPiece] of string;
-    PlayerPerceptrons: array[WhitePiece..BlackPiece] of TPlayerPerceptrons;
+    TournamentPlayers: array[1..TOURNAMENT_PLAYER_COUNT] of TPlayerPerceptrons;
 
     JsonManager: TJsonFileManager;
 
     procedure ClearStringGrid;
-    procedure UpdatePlayerStatisticsLabels;
+    procedure UpdatePlayerStatisticsLabel(const PlayerIndex: integer);
+    function CreateRandomPlayer: TPlayerPerceptrons;
 
   public
 
@@ -78,7 +74,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   p: TPerceptron;
   i: integer;
-  player: PlayerPiece;
+  pi: integer;
   perceptrons: TPerceptronArray;
   pp: TPlayerPerceptrons;
 begin
@@ -89,20 +85,14 @@ begin
   SaveDialog1.Filter := 'JSON files (*.json)|*.json|All Files (*.*)|*.*';
 
   LabelCurrentPerceptronMessage.Caption := '';
-  LabelWhitePlayerStatistics.Caption := '';
-  LabelBlackPlayerStatistics.Caption := '';
+  LabelPlayerStatistics.Caption := '';
   LabelFileMessage.Caption := '';
-
-  ButtonNextPerceptron.Enabled := false;
-  ButtonPriorPerceptron.Enabled := false;
 
   TheBoard := TGameBoard.Create;
 
-  PlayerName[WhitePiece] := 'White';
-  PlayerName[BlackPiece] := 'Black';
-
-  for player := WhitePiece to BlackPiece do begin
+  for pi := 1 to TOURNAMENT_PLAYER_COUNT do begin
     pp := TPlayerPerceptrons.Create;
+    pp.PlayerName := Format(PLAYER_NAME_FORMAT, [pi]);
     pp.PenteWins := 0;
     pp.CaptureWins := 0;
     pp.PenteLosses := 0;
@@ -111,30 +101,29 @@ begin
     perceptrons := pp.Perceptrons;
     for i := Low(perceptrons) to High(perceptrons) do begin
       p := TPerceptron.Create;
-      p.RandomizeWeights;
+      p.RandomizePatternsAndWeight;
       perceptrons[i] := p;
     end;
-    PlayerPerceptrons[player] := pp;
+    TournamentPlayers[pi] := pp;
   end;
 
-  UpdatePlayerStatisticsLabels;
+  CurrentPlayerIndex := 1;
+  UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
+  CurrentPerceptrons := TournamentPlayers[CurrentPlayerIndex].Perceptrons;
+  PerceptronIndex := Low(CurrentPerceptrons);
+  DisplayPerceptron(CurrentPerceptrons[PerceptronIndex]);
 
   JsonManager := TJsonFileManager.Create;
 end;
 
-procedure TForm1.UpdatePlayerStatisticsLabels;
+procedure TForm1.UpdatePlayerStatisticsLabel(const PlayerIndex: integer);
 begin
-  LabelWhitePlayerStatistics.Caption :=
-    Format('%d Wins by Pente, %d Wins by Capture, %d Losses by Pente, %d Losses by Capture',
-    [PlayerPerceptrons[WhitePiece].PenteWins, PlayerPerceptrons[WhitePiece].CaptureWins,
-     PlayerPerceptrons[WhitePiece].PenteLosses, PlayerPerceptrons[WhitePiece].CaptureLosses]);
-  LabelWhitePlayerStatistics.Repaint;
-
-  LabelBlackPlayerStatistics.Caption :=
-    Format('%d Wins by Pente, %d Wins by Capture, %d Losses by Pente, %d Losses by Capture',
-    [PlayerPerceptrons[BlackPiece].PenteWins, PlayerPerceptrons[BlackPiece].CaptureWins,
-     PlayerPerceptrons[BlackPiece].PenteLosses, PlayerPerceptrons[BlackPiece].CaptureLosses]);
-  LabelBlackPlayerStatistics.Repaint;
+  LabelPlayerStatistics.Caption :=
+    Format('%s: %d Pente Wins, %d Capture Wins, %d Pente Losses, %d Capture Losses',
+    [TournamentPlayers[PlayerIndex].PlayerName,
+     TournamentPlayers[PlayerIndex].PenteWins, TournamentPlayers[PlayerIndex].CaptureWins,
+     TournamentPlayers[PlayerIndex].PenteLosses, TournamentPlayers[PlayerIndex].CaptureLosses]);
+  LabelPlayerStatistics.Repaint;
 
   {$IFDEF LINUX}
   Application.ProcessMessages;
@@ -151,9 +140,7 @@ var
 begin
   LabelCurrentPerceptronMessage.Caption :=
     Format('%s Perceptron # %d: Weight = %g',
-      [PlayerName[CurrentPlayer], PerceptronIndex, Perceptron.Weight]);
-  ButtonNextPerceptron.Enabled := true;
-  ButtonPriorPerceptron.Enabled := true;
+      [TournamentPlayers[CurrentPlayerIndex].PlayerName, PerceptronIndex, Perceptron.Weight]);
   TheBoard.LoadPerceptron(CurrentPerceptrons[PerceptronIndex]);
   GameBoardDrawGrid.Repaint;
 
@@ -170,18 +157,28 @@ begin
   end;
 end;
 
-procedure TForm1.ButtonLoadWhiteClick(Sender: TObject);
+procedure TForm1.ButtonLoadNextPlayerClick(Sender: TObject);
 begin
-  CurrentPlayer := WhitePiece;
-  CurrentPerceptrons := PlayerPerceptrons[WhitePiece].Perceptrons;
+  Inc(CurrentPlayerIndex);
+  if (CurrentPlayerIndex > TOURNAMENT_PLAYER_COUNT) then begin
+    CurrentPlayerIndex := 1;
+  end;
+
+  UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
+  CurrentPerceptrons := TournamentPlayers[CurrentPlayerIndex].Perceptrons;
   PerceptronIndex := Low(CurrentPerceptrons);
   DisplayPerceptron(CurrentPerceptrons[PerceptronIndex]);
 end;
 
-procedure TForm1.ButtonLoadBlackClick(Sender: TObject);
+procedure TForm1.ButtonLoadPriorPlayerClick(Sender: TObject);
 begin
-  CurrentPlayer := BlackPiece;
-  CurrentPerceptrons := PlayerPerceptrons[BlackPiece].Perceptrons;
+  Dec(CurrentPlayerIndex);
+  if (CurrentPlayerIndex < 1) then begin
+    CurrentPlayerIndex := TOURNAMENT_PLAYER_COUNT;
+  end;
+
+  UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
+  CurrentPerceptrons := TournamentPlayers[CurrentPlayerIndex].Perceptrons;
   PerceptronIndex := Low(CurrentPerceptrons);
   DisplayPerceptron(CurrentPerceptrons[PerceptronIndex]);
 end;
@@ -216,22 +213,6 @@ begin
   end;
 end;
 
-procedure TForm1.GameBoardDrawGridMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  col: integer;
-  row: integer;
-begin
-  if (Button = mbLeft) then begin
-    CurrentPlayer := WhitePiece;
-  end else begin
-    CurrentPlayer := BlackPiece;
-  end;
-
-  GameBoardDrawGrid.MouseToCell(X, Y, col, row);
-  TheBoard.Cells[col, row] := DoNotCare;
-end;
-
 procedure TForm1.GameBoardDrawGridDrawCell(Sender: TObject; aCol, aRow: Integer;
   aRect: TRect; aState: TGridDrawState);
 var
@@ -242,13 +223,8 @@ var
 begin
   theCanvas := TDrawGrid(Sender).Canvas;
 
-  if (CurrentPlayer = WhitePiece) then begin
-    selfColor := clWhite;
-    opponentColor := clBlack;
-  end else begin
-      selfColor := clBlack;
-      opponentColor := clWhite;
-  end;
+  selfColor := clWhite;
+  opponentColor := clBlack;
 
   cell := TheBoard.Cells[aCol, aRow];
 
@@ -282,9 +258,10 @@ var
   filename: string;
   jsonObj: TJSONObject;
   jsonPlayer: TJSONObject;
-  player: PlayerPiece;
+  pi: integer;
   perceptrons: TPerceptronArray;
   pp: TPlayerPerceptrons;
+  playerName: string;
 begin
   if (OpenDialog1.Execute) then begin
     filename := OpenDialog1.Filename;
@@ -293,17 +270,30 @@ begin
     end else begin
       jsonObj := JsonManager.ReadJsonFromFile(filename);
 
-      for player := WhitePiece to BlackPiece do begin
-        pp := PlayerPerceptrons[player];
+      for pi := 1 to TOURNAMENT_PLAYER_COUNT do begin;
+        pp := TournamentPlayers[pi];
 
-        jsonPlayer := jsonManager.ParseJsonPlayer(jsonObj, player);
-        JsonManager.ParsePlayerWinsAndLosses(jsonPlayer, pp);
+        playerName := Format(PLAYER_NAME_FORMAT, [pi]);
 
-        perceptrons := pp.Perceptrons;
-        JsonManager.ParseJsonPerceptrons(jsonPlayer, perceptrons);
+        jsonPlayer := jsonManager.ParseJsonPlayer(jsonObj, playerName);
+
+        if (jsonPlayer = nil) then begin
+          pp := CreateRandomPlayer;
+          pp.PlayerName := playerName;
+          TournamentPlayers[pi] := pp;
+        end else begin
+          JsonManager.ParsePlayerWinsAndLosses(jsonPlayer, pp);
+          perceptrons := pp.Perceptrons;
+          JsonManager.ParseJsonPerceptrons(jsonPlayer, perceptrons);
+        end;
       end;
 
-      UpdatePlayerStatisticsLabels;
+      CurrentPlayerIndex := 1;
+      UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
+      CurrentPerceptrons := TournamentPlayers[CurrentPlayerIndex].Perceptrons;
+      PerceptronIndex := Low(CurrentPerceptrons);
+      DisplayPerceptron(CurrentPerceptrons[PerceptronIndex]);
+
       LabelFileMessage.Caption := 'Perceptrons read from file ' + filename;
     end;
   end else begin
@@ -311,19 +301,27 @@ begin
   end;
 end;
 
-procedure TForm1.ButtonWritePerceptronsToFileClick(Sender: TObject);
+function TForm1.CreateRandomPlayer: TPlayerPerceptrons;
 var
-  filename: string;
-  jsonText: string;
+  p: TPerceptron;
+  i: integer;
+  perceptrons: TPerceptronArray;
+  pp: TPlayerPerceptrons;
 begin
-  if (SaveDialog1.Execute) then begin
-    filename := SaveDialog1.Filename;
-    jsonText := JsonManager.GenerateJsonString(PlayerPerceptrons);
-    JsonManager.WriteJsonToFile(filename, jsonText);
-    LabelFileMessage.Caption := 'Perceptrons written to file ' + PERCEPTRONS_FILE_NAME;
-  end else begin
-    LabelFileMessage.Caption := '(File write operation cancelled.)';
+  pp := TPlayerPerceptrons.Create;
+  pp.PenteWins := 0;
+  pp.CaptureWins := 0;
+  pp.PenteLosses := 0;
+  pp.CaptureLosses := 0;
+  SetLength(pp.Perceptrons, PERCEPTRON_COUNT);
+  perceptrons := pp.Perceptrons;
+  for i := Low(perceptrons) to High(perceptrons) do begin
+    p := TPerceptron.Create;
+    p.RandomizePatternsAndWeight;
+    perceptrons[i] := p;
   end;
+
+  result := pp;
 end;
 
 end.
