@@ -10,8 +10,9 @@ uses
   Classes, SysUtils;
 
 const
+  MAX_PLAYER_COUNT = 100;
+
   PLAYER_NAME_FORMAT = 'Plyr %d';
-  TOURNAMENT_PLAYER_COUNT = 6;
 
   MIN_PATTERN_INDEX = 0;
   MIDDLE_PATTERN_INDEX = 5;

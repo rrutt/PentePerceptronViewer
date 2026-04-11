@@ -8,7 +8,7 @@ interface
 
 uses
   SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, Menus, Grids, Types,
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, Menus, Grids, Types, Math,
   fpjson,
   constants, gameboard, jsonfilemanager, playerperceptrons, perceptron;
 
@@ -47,17 +47,18 @@ type
   private
     TheBoard: TGameBoard;
 
+    PlayerCount: integer;
     CurrentPlayerIndex: integer;
     CurrentPerceptrons: TPerceptronArray;
     PerceptronIndex: integer;
 
-    TournamentPlayers: array[1..TOURNAMENT_PLAYER_COUNT] of TPlayerPerceptrons;
+    TournamentPlayers: array[1..MAX_PLAYER_COUNT] of TPlayerPerceptrons;
 
     JsonManager: TJsonFileManager;
 
     procedure ClearStringGrid;
     procedure UpdatePlayerStatisticsLabel(const PlayerIndex: integer);
-    function CreateRandomPlayer: TPlayerPerceptrons;
+    function CreateEmptyPlayer(const PlayerIndex: integer): TPlayerPerceptrons;
 
   public
 
@@ -72,10 +73,7 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  p: TPerceptron;
-  i: integer;
   pi: integer;
-  perceptrons: TPerceptronArray;
   pp: TPlayerPerceptrons;
 begin
   OpenDialog1.InitialDir := ExtractFilePath(Application.ExeName);
@@ -90,22 +88,11 @@ begin
 
   TheBoard := TGameBoard.Create;
 
-  for pi := 1 to TOURNAMENT_PLAYER_COUNT do begin
-    pp := TPlayerPerceptrons.Create;
-    pp.PlayerName := Format(PLAYER_NAME_FORMAT, [pi]);
-    pp.PenteWins := 0;
-    pp.CaptureWins := 0;
-    pp.PenteLosses := 0;
-    pp.CaptureLosses := 0;
-    SetLength(pp.Perceptrons, PERCEPTRON_COUNT);
-    perceptrons := pp.Perceptrons;
-    for i := Low(perceptrons) to High(perceptrons) do begin
-      p := TPerceptron.Create;
-      p.RandomizePatternsAndWeight;
-      perceptrons[i] := p;
-    end;
+  for pi := 1 to MAX_PLAYER_COUNT do begin
+    pp := CreateEmptyPlayer(pi);
     TournamentPlayers[pi] := pp;
   end;
+  PlayerCount := MAX_PLAYER_COUNT;
 
   CurrentPlayerIndex := 1;
   UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
@@ -114,6 +101,30 @@ begin
   DisplayPerceptron(CurrentPerceptrons[PerceptronIndex]);
 
   JsonManager := TJsonFileManager.Create;
+end;
+
+function TForm1.CreateEmptyPlayer(const PlayerIndex: integer): TPlayerPerceptrons;
+var
+  pp: TPlayerPerceptrons;
+  perceptrons: TPerceptronArray;
+  p: TPerceptron;
+  i: integer;
+begin
+  pp := TPlayerPerceptrons.Create;
+  pp.PlayerName := Format(PLAYER_NAME_FORMAT, [PlayerIndex]);
+  pp.PenteWins := 0;
+  pp.CaptureWins := 0;
+  pp.PenteLosses := 0;
+  pp.CaptureLosses := 0;
+  SetLength(pp.Perceptrons, PERCEPTRON_COUNT);
+  perceptrons := pp.Perceptrons;
+  for i := Low(perceptrons) to High(perceptrons) do begin
+    p := TPerceptron.Create;
+    p.RandomizePatternsAndWeight;
+    perceptrons[i] := p;
+  end;
+
+  result := pp;
 end;
 
 procedure TForm1.UpdatePlayerStatisticsLabel(const PlayerIndex: integer);
@@ -160,8 +171,8 @@ end;
 procedure TForm1.ButtonLoadNextPlayerClick(Sender: TObject);
 begin
   Inc(CurrentPlayerIndex);
-  if (CurrentPlayerIndex > TOURNAMENT_PLAYER_COUNT) then begin
-    CurrentPlayerIndex := 1;
+  if (CurrentPlayerIndex > PlayerCount) then begin
+    CurrentPlayerIndex := Low(TournamentPlayers);
   end;
 
   UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
@@ -173,8 +184,8 @@ end;
 procedure TForm1.ButtonLoadPriorPlayerClick(Sender: TObject);
 begin
   Dec(CurrentPlayerIndex);
-  if (CurrentPlayerIndex < 1) then begin
-    CurrentPlayerIndex := TOURNAMENT_PLAYER_COUNT;
+  if (CurrentPlayerIndex < Low(TournamentPlayers)) then begin
+    CurrentPlayerIndex := Max(PlayerCount, 1);
   end;
 
   UpdatePlayerStatisticsLabel(CurrentPlayerIndex);
@@ -270,18 +281,16 @@ begin
     end else begin
       jsonObj := JsonManager.ReadJsonFromFile(filename);
 
-      for pi := 1 to TOURNAMENT_PLAYER_COUNT do begin;
-        pp := TournamentPlayers[pi];
-
+      PlayerCount := 0;
+      for pi := 1 to MAX_PLAYER_COUNT do begin
         playerName := Format(PLAYER_NAME_FORMAT, [pi]);
-
         jsonPlayer := jsonManager.ParseJsonPlayer(jsonObj, playerName);
 
         if (jsonPlayer = nil) then begin
-          pp := CreateRandomPlayer;
-          pp.PlayerName := playerName;
-          TournamentPlayers[pi] := pp;
+          break; // out of for loop
         end else begin
+          Inc(PlayerCount);
+          pp := TournamentPlayers[pi];
           JsonManager.ParsePlayerWinsAndLosses(jsonPlayer, pp);
           perceptrons := pp.Perceptrons;
           JsonManager.ParseJsonPerceptrons(jsonPlayer, perceptrons);
@@ -299,29 +308,6 @@ begin
   end else begin
     LabelFileMessage.Caption := '(File read operation cancelled.)';
   end;
-end;
-
-function TForm1.CreateRandomPlayer: TPlayerPerceptrons;
-var
-  p: TPerceptron;
-  i: integer;
-  perceptrons: TPerceptronArray;
-  pp: TPlayerPerceptrons;
-begin
-  pp := TPlayerPerceptrons.Create;
-  pp.PenteWins := 0;
-  pp.CaptureWins := 0;
-  pp.PenteLosses := 0;
-  pp.CaptureLosses := 0;
-  SetLength(pp.Perceptrons, PERCEPTRON_COUNT);
-  perceptrons := pp.Perceptrons;
-  for i := Low(perceptrons) to High(perceptrons) do begin
-    p := TPerceptron.Create;
-    p.RandomizePatternsAndWeight;
-    perceptrons[i] := p;
-  end;
-
-  result := pp;
 end;
 
 end.
