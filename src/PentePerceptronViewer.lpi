@@ -16,9 +16,8 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <MajorVersionNr Value="1"/>
-      <RevisionNr Value="1"/>
-      <StringTable CompanyName="Richard Rutt" FileDescription="Pente Perceptron Viewer" LegalCopyright="Copyright 2025 Rick Rutt" ProductName="Perceptron Pente" ProductVersion="1.0.1+20250616"/>
+      <MajorVersionNr Value="2"/>
+      <StringTable CompanyName="Richard Rutt" FileDescription="Pente Perceptron Viewer" LegalCopyright="Copyright 2025-2026 Rick Rutt" ProductName="Perceptron Pente" ProductVersion="2.0.0+20260411"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
@@ -82,6 +81,7 @@
     <Linking>
       <Debugging>
         <GenerateDebugInfo Value="False"/>
+        <RunWithoutDebug Value="True"/>
         <DebugInfoType Value="dsDwarf2"/>
       </Debugging>
       <Options>

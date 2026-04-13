@@ -1,6 +1,6 @@
 # Pente Perceptron Viewer
 
-_Version 1.0.1+20250616  ([Version Release Notes](#ReleaseNotes))_ 
+_Version 2.0.0+20260411  ([Version Release Notes](#ReleaseNotes))_ 
 
 The **Pente Perceptron Viewer** is a companion project for the **[Perceptron Pente](https://github.com/rrutt/PerceptronPente)** program.
 
@@ -50,10 +50,12 @@ The Form contains these elements:
 
 - The 11x11 Pattern Match grid.
 - The corresponding 11x11 grid showing pattern match weights for each position.
-- Click the **Load White** button to load the White player's first Perceptron pattern into the grids.
-- Click the **Load Black** button to load the Black player's first Perceptron pattern into the grids.
+- Click the **Load Next Player** button to load the next tournament player's first Perceptron pattern into the grids.
+- Click the **Load Prior Player** button to load the prior tournament player's first Perceptron pattern into the grids.
 - Clic the **Next Perceptron** or **Prior Perceptron** button to sequence through the current player's Perceptron set.
-- Click the **Read Perceptrons from File** button to load both players' Perceptron sets from a previously saved JSON text file. 
+- Click the **Read Perceptrons from File** button to load the players' Perceptron sets from a previously saved JSON text file. 
+
+## Interpreting the Perceptron display grid
 
 During **Perceptron Pente** game play, each Perceptron pattern is evaluated against all empty Game Board cells, with the center Pattern Match cell positioned over the Game Board cell being evaluated.
 
@@ -62,7 +64,8 @@ The neighboring Game Board cell contents are evaluated against the corresponding
 - Pattern Match offsets that fall off the Game Board are ignored.
 - A gray Pattern Match position indicates a _Do Not Care_ value for the corresponding Game Board cell.
 - An olive Pattern Match position indicates a match on an empty Game Board cell.
-- A White or Black position indicates a match if the corresponding Game Board cell matches the current player (same color) or the opponent player (opposite color).
+- A White position indicates a match if the corresponding Game Board cell matches the current player.
+- A Black position indicates a match if the corresponding Game Board cell matches the opponent player.
 - Each matching cell has its corresponding Pattern Match cell weight accumulated for the Perceptron vs. the Game Board cell being evaluated.
 - The accumulated cell weights are multiplied by the Perceptron weight.
 - All of the player's other Perceptrons are evaluated against the Game Board empty cell being evaluated.
@@ -90,6 +93,10 @@ Then rebuild the executable using the **Run | Build** menu item (or using the sh
 <a name="ReleaseNotes"></a>
 
 ## Release Notes
+
+### Version 2.0.0
+
+- Support the multi-player tournament structure of the JSON file as written by **PerceptronPente** Version 2.0.0.
 
 ### Version 1.0.1
 
